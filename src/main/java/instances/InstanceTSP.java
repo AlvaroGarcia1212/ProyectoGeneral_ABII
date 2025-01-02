@@ -1,12 +1,13 @@
 package instances;
 
+import problems.tsp.TSPSolution;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
-public class InstanceTSP implements Instance {
+public class InstanceTSP implements Instance<Double, TSPSolution> {
 
     private String name;
     private int nPuntos;
@@ -44,6 +45,36 @@ public class InstanceTSP implements Instance {
         double d1 = a[0] - b[0];
         double d2 = a[1] - b[1];
         return Math.sqrt(d1 * d1 + d2 * d2);
+    }
+
+    public int getN() {return nPuntos;}
+
+    public double[] getDistances(int idx) {return distances[idx];}
+
+    @Override
+    public Double evaluate(TSPSolution solution) {
+        double value = 0;
+        for (int sourcePosition = 0; sourcePosition < nPuntos; sourcePosition++) {
+            int targetPosition = (sourcePosition + 1) % nPuntos;
+            value += this.calculateDistance(
+                    coordinates[solution.getRoute()[sourcePosition]],
+                    coordinates[solution.getRoute()[targetPosition]]);
+        }
+        return value;
+    }
+
+    public TSPSolution generateRandomSolution() {
+        Integer[] sol = new Integer[nPuntos];
+        List<Integer> aux = new ArrayList<>();
+        for (int i = 0; i < nPuntos; i++) {
+            aux.add(i);
+        }
+        Collections.shuffle(aux);
+        for (int i = 0; i < nPuntos; i++) {
+            sol[i] = aux.get(i);
+        }
+        aux.clear();
+        return new TSPSolution(sol,this);
     }
 
 }
